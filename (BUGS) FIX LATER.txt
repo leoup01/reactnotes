@@ -1,0 +1,8 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+
+//Deeria de estar en false o aplicar reglas de auntenticacion

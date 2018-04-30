@@ -32,9 +32,9 @@ body {
 .notesHeader {
   display: flex;
   flex: 1 1 5%;
-  min-height: 2.5em;
-  max-height: 2em;
-  font-size: 3.2em;
+  min-height: 6.5em;
+  max-height: 7em;
+  font-size: 1.2em;
   color: #F4B350;
   font-family: 'Righteous', cursive;
   text-align: center;
@@ -47,7 +47,7 @@ body {
 }
 
 .notesBody {
-  padding-top: 24px;
+  padding-top: 54px;
   display: flex;
   flex: 1 1 85%;
   flex-wrap: wrap;

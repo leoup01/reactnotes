@@ -3,24 +3,73 @@ import logo from './logo.svg';
 import './App.css';
 import Note from './components/Note';
 import NoteForm from './components/NoteForm';
-
+import { DB_CONFIG } from './config/config';
+//import firebase from 'firebase/app';
+import * as firebase from 'firebase';
+import 'firebase/database';
+var config = {
+    apiKey: "AIzaSyCdjammAhJXZq0DWe4rUS0DVg-UvJEpr8U",
+    authDomain: "reactnotes-92c3d.firebaseapp.com",
+    databaseURL: "https://reactnotes-92c3d.firebaseio.com",
+    projectId: "reactnotes-92c3d",
+    storageBucket: "reactnotes-92c3d.appspot.com",
+    messagingSenderId: "559019045439"
+  };
+  //firebase.initializeApp(config);
+  var fb = firebase.initializeApp(DB_CONFIG);
 class App extends Component {
+
   constructor(props){
     super(props);
-    this.state = {
-      notes: [
-        {noteId: 1, noteContent: "Note 1"},
-        {noteId: 2, noteContent: "Note 2"}
-      ]
-    }
+    //firebase2.initializeApp(DB_CONFIG);
+    //var fb = firebase.initializeApp(DB_CONFIG);
+    this.app = fb;
+    //this.app = firebase.initializeApp(config);
     this.addNote = this.addNote.bind(this);
+    this.removeNote = this.removeNote.bind(this);
+    this.database = this.app.database().ref().child('notes');
 
+    this.state = {
+      notes: []
+    }
+  }
+
+  componentWillMount(){
+    const previousNotes = this.state.notes;
+    
+    this.database.on('child_added', snap =>{
+      previousNotes.push({
+        id: snap.key,
+        noteContent: snap.val().noteContent
+      });
+      this.setState({
+        notes: previousNotes
+      });
+    });
+
+    this.database.on('child_removed', snap => {
+      for(var i=0; i < previousNotes.length; i++){
+        if(previousNotes[i].id === snap.key){
+          previousNotes.splice(i, 1);
+        }
+      }
+
+      this.setState({
+        notes: previousNotes
+      })
+    });
   }
 
   addNote(note){
-    const previousNotes = this.state.notes;
-    previousNotes.push({id:previousNotes.lenght+1, noteContent:note});
-    this.setState({notes: previousNotes});
+    this.database.push().set({noteContent:note});
+    //const previousNotes = this.state.notes;
+    //previousNotes.push({id:previousNotes.lenght+1, noteContent:note});
+    //this.setState({notes: previousNotes});
+  }
+
+  removeNote(noteId){
+    console.log(noteId);
+    this.database.child(noteId).remove();
   }
 
   render() {
@@ -35,7 +84,11 @@ class App extends Component {
         {
           this.state.notes.map( (note) =>{
             console.log(note);
-            return (<Note noteContent={note.noteContent} noteId={note.noteId} key={note.noteId}/>);
+            return (<Note 
+                      noteContent={note.noteContent}
+                      removeNote={this.removeNote}
+                      noteId={note.id}
+                      key={note.id}/>);
           })
         }
         </div>
